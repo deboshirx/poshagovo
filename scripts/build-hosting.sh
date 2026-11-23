@@ -6,12 +6,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 OUT=build/hosting
+# в какой папке сайта будет жить приложение (/ — в корне)
+export VITE_BASE="${VITE_BASE:-/poshagovo/}"
 
-npm run build
+# собираем фронт в отдельную папку, чтобы не затереть client/dist для Node-версии
+npm run build -w client -- --outDir ../build/client-hosting --emptyOutDir
 rm -rf "$OUT"
 mkdir -p "$OUT"
-cp -R client/dist/. "$OUT"/
+cp -R build/client-hosting/. "$OUT"/
 cp -R php/. "$OUT"/
+sed -i.bak "s#^RewriteEngine On#RewriteEngine On\nRewriteBase $VITE_BASE#" "$OUT"/.htaccess && rm "$OUT"/.htaccess.bak
 cp server/src/schema.sql "$OUT"/server/schema.sql
 
 # демо-база генерируется тем же сидом, что и для Node-версии

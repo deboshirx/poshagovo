@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import Markdown from '../components/Markdown';
 import { ErrorBox, Loader } from '../components/ui';
-import { DIFFICULTY, formatMinutes } from '../utils';
+import { DIFFICULTY, absoluteUrl, formatMinutes } from '../utils';
 
 // Версия для печати. PDF делается через системный диалог печати → «Сохранить как PDF».
 // Так шрифты и кириллица гарантированно в порядке, в отличие от генерации PDF на клиенте.
@@ -67,7 +67,7 @@ export default function PrintPage() {
       ))}
 
       <footer className="print-footer muted">
-        {window.location.origin}/g/{guide.id} — пройти интерактивно с отметками и комментариями
+        {absoluteUrl(`g/${guide.id}`)} — пройти интерактивно с отметками и комментариями
       </footer>
     </div>
   );

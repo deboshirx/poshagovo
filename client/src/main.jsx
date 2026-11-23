@@ -12,17 +12,20 @@ import Editor from './pages/Editor';
 import Stats from './pages/Stats';
 import NotFound from './pages/NotFound';
 import { flushEvents } from './offline';
+import { BASE, appUrl } from './utils';
 import './styles.css';
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('SW не зарегистрирован', err));
+  navigator.serviceWorker
+    .register(appUrl('sw.js'), { scope: BASE })
+    .catch((err) => console.warn('SW не зарегистрирован', err));
 }
 
 // если в прошлый раз что-то не отправилось — пробуем сейчас
 flushEvents();
 
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
+  <BrowserRouter basename={BASE.replace(/\/$/, '') || '/'}>
     <AuthProvider>
       <Routes>
         <Route path="/embed/:id" element={<Player embedded />} />

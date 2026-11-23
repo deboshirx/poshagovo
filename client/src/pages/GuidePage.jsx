@@ -5,7 +5,7 @@ import { useAuth } from '../auth';
 import { loadLocalProgress } from '../offline';
 import { StarsInput, StarsView } from '../components/Stars';
 import { CopyButton, ErrorBox, Loader, ProgressBar, RoleBadge } from '../components/ui';
-import { DIFFICULTY, categoryName, formatMinutes, plural, pluralN, timeAgo } from '../utils';
+import { DIFFICULTY, absoluteUrl, categoryName, formatMinutes, plural, pluralN, timeAgo } from '../utils';
 
 export default function GuidePage() {
   const { id } = useParams();
@@ -29,7 +29,7 @@ export default function GuidePage() {
   const isAuthor = user?.id === guide.author_id;
   const local = loadLocalProgress(id);
   const inProgress = local && local.index > 0;
-  const embedCode = `<iframe src="${window.location.origin}/embed/${guide.id}" width="100%" height="620" style="border:0;border-radius:12px" title="${guide.title.replace(/"/g, '&quot;')}"></iframe>`;
+  const embedCode = `<iframe src="${absoluteUrl(`embed/${guide.id}`)}" width="100%" height="620" style="border:0;border-radius:12px" title="${guide.title.replace(/"/g, '&quot;')}"></iframe>`;
 
   async function run(action) {
     setActionError(null);

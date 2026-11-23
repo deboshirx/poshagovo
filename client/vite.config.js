@@ -2,6 +2,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  // для хостинга в подпапке: VITE_BASE=/poshagovo/ npm run build
+  base: process.env.VITE_BASE || '/',
   plugins: [react()],
   server: {
     port: 5173,

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { RoleBadge } from './ui';
+import { appUrl } from '../utils';
 
 function useOnline() {
   const [online, setOnline] = useState(navigator.onLine);
@@ -34,7 +35,7 @@ export default function Layout() {
       <header className="header">
         <div className="container header-inner">
           <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
-            <img src="/icon.svg" alt="" width="30" height="30" />
+            <img src={appUrl('icon.svg')} alt="" width="30" height="30" />
             Пошагово
           </Link>
 

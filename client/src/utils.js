@@ -1,3 +1,9 @@
+// Приложение может жить не в корне домена, а в подпапке (например /poshagovo/ на хостинге).
+// Путь задаётся при сборке через VITE_BASE.
+export const BASE = import.meta.env.BASE_URL;
+export const appUrl = (path = '') => BASE + path.replace(/^\//, '');
+export const absoluteUrl = (path = '') => window.location.origin + appUrl(path);
+
 export function plural(n, forms) {
   const [one, few, many] = forms;
   const mod10 = n % 10;

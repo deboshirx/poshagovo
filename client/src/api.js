@@ -23,7 +23,7 @@ export async function api(path, { method = 'GET', body } = {}) {
 
   let res;
   try {
-    res = await fetch('/api' + path, {
+    res = await fetch(import.meta.env.BASE_URL + 'api' + path, {
       method: httpMethod,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),

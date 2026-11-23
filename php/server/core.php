@@ -3,9 +3,16 @@
 
 define('DEMO_PASSWORD', 'demo1234');
 
+// База должна лежать вне корня сайта, иначе её можно скачать.
+// На хостинге корень называется docs — ищем его вверх по дереву и кладём базу рядом.
+// Так работает и для отдельного сайта, и когда приложение лежит в подпапке чужого сайта.
 function db_path()
 {
-    return getenv('POSHAGOVO_DB') ?: dirname(__DIR__, 2) . '/data/app.db';
+    if (getenv('POSHAGOVO_DB')) return getenv('POSHAGOVO_DB');
+    for ($dir = dirname(__DIR__); $dir !== dirname($dir); $dir = dirname($dir)) {
+        if (basename($dir) === 'docs') return dirname($dir) . '/data/poshagovo.db';
+    }
+    return dirname(__DIR__, 2) . '/data/poshagovo.db';
 }
 
 class HttpError extends Exception

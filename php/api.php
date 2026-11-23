@@ -46,7 +46,8 @@ $routes = [
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$path = preg_replace('#^/api#', '', rtrim($path, '/')) ?: '/';
+// приложение может лежать в подпапке: /poshagovo/api/guides -> /guides
+$path = preg_replace('#^.*?/api(?=/|$)#', '', rtrim($path, '/')) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'POST' && ($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? '') === 'PATCH') $method = 'PATCH';
 

@@ -7,7 +7,7 @@ import Markdown from '../components/Markdown';
 import StepComments from '../components/StepComments';
 import { StarsInput } from '../components/Stars';
 import { ErrorBox, Loader, ProgressBar } from '../components/ui';
-import { formatMinutes, plural } from '../utils';
+import { appUrl, formatMinutes, plural } from '../utils';
 
 export default function Player({ embedded = false }) {
   const { id } = useParams();
@@ -242,7 +242,7 @@ export default function Player({ embedded = false }) {
           <div className="finish-actions">
             <button className="btn" onClick={restart}>Пройти заново</button>
             {embedded ? (
-              <a className="btn btn-primary" href={`/g/${id}`} target="_blank" rel="noreferrer">
+              <a className="btn btn-primary" href={appUrl(`g/${id}`)} target="_blank" rel="noreferrer">
                 Открыть на Пошагово ↗
               </a>
             ) : (
@@ -370,7 +370,7 @@ export default function Player({ embedded = false }) {
 
       {embedded && (
         <div className="embed-footer">
-          <a href={`/g/${id}`} target="_blank" rel="noreferrer">
+          <a href={appUrl(`g/${id}`)} target="_blank" rel="noreferrer">
             Сделано на Пошагово ↗
           </a>
         </div>

@@ -2,8 +2,10 @@
 // Статику отдаём из кэша, API — сначала сеть, при её отсутствии последний сохранённый ответ.
 // Так открытая хотя бы раз инструкция проходится и без интернета (например, в подвале у деканата).
 
-const CACHE = 'poshagovo-v1';
-const SHELL = ['/', '/manifest.webmanifest', '/icon.svg'];
+const CACHE = 'poshagovo-v2';
+// сайт может лежать в подпапке — берём её из scope регистрации
+const BASE = new URL(self.registration.scope).pathname;
+const SHELL = [BASE, BASE + 'manifest.webmanifest', BASE + 'icon.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
@@ -51,12 +53,14 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== location.origin) return;
 
-  if (url.pathname.startsWith('/api/')) {
+  if (!url.pathname.startsWith(BASE)) return;
+
+  if (url.pathname.startsWith(BASE + 'api/')) {
     // личные данные не кэшируем
-    if (url.pathname.startsWith('/api/auth') || url.pathname.includes('/stats')) return;
+    if (url.pathname.startsWith(BASE + 'api/auth') || url.pathname.includes('/stats')) return;
     event.respondWith(networkFirst(request));
   } else if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request, '/'));
+    event.respondWith(networkFirst(request, BASE));
   } else {
     event.respondWith(cacheFirst(request));
   }
