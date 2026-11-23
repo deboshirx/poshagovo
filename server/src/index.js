@@ -21,6 +21,12 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '1mb' }));
 app.use(loadUser);
 
+// клиент отправляет PATCH как POST + X-HTTP-Method-Override (см. client/src/api.js)
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.get('x-http-method-override') === 'PATCH') req.method = 'PATCH';
+  next();
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/guides', guideRoutes);
 app.use('/api/runs', runRoutes);

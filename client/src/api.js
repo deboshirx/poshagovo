@@ -13,10 +13,18 @@ export async function api(path, { method = 'GET', body } = {}) {
   if (token) headers.Authorization = `Bearer ${token}`;
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
+  // некоторые хостинги (наш RU-CENTER в том числе) режут PATCH на входе,
+  // поэтому шлём его как POST с заголовком — сервер подменит метод сам
+  let httpMethod = method;
+  if (method === 'PATCH') {
+    httpMethod = 'POST';
+    headers['X-HTTP-Method-Override'] = 'PATCH';
+  }
+
   let res;
   try {
     res = await fetch('/api' + path, {
-      method,
+      method: httpMethod,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
     });
