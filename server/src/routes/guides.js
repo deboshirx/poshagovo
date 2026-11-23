@@ -313,7 +313,7 @@ router.post('/:id/rate', requireAuth, (req, res) => {
   const guide = findGuide(toInt(req.params.id), req.user);
   const stars = toInt(req.body.stars);
   if (stars < 1 || stars > 5) throw new HttpError(400, 'Оценка от 1 до 5');
-  if (guide.author_id === req.user.id) throw new HttpError(400, 'Свою инструкцию оценивать нельзя 🙂');
+  if (guide.author_id === req.user.id) throw new HttpError(400, 'Свою инструкцию оценивать нельзя');
 
   db.prepare(`
     INSERT INTO ratings (guide_id, user_id, stars) VALUES (?, ?, ?)

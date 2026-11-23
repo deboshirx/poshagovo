@@ -132,7 +132,7 @@ function analytics_explain(array $s)
 {
     $reasons = [];
     if ($s['leftHere']) $reasons[] = "здесь бросили {$s['leftHere']} из {$s['reached']} (" . round($s['dropRate'] * 100) . '%)';
-    if ($s['stuck']) $reasons[] = "«Застрял» нажимали {$s['stuck']} раз";
+    if ($s['stuck']) $reasons[] = "«Не получается» нажимали {$s['stuck']} раз";
     if ($s['medianMs'] && $s['medianMs'] > $s['plannedMinutes'] * 60000 * 1.3) {
         $reasons[] = 'в среднем ' . round($s['medianMs'] / 60000) . " мин вместо {$s['plannedMinutes']}";
     }

@@ -23,7 +23,7 @@ export default function Player({ embedded = false }) {
   const [done, setDone] = useState(false);
   const [warnUnchecked, setWarnUnchecked] = useState(false);
   const [comments, setComments] = useState([]);
-  const [panel, setPanel] = useState(null); // null | 'comment' | 'question' (после «Застрял»)
+  const [panel, setPanel] = useState(null); // null | 'comment' | 'question' (после «Не получается»)
   const [myRating, setMyRating] = useState(null);
   const enteredAt = useRef(Date.now());
 
@@ -200,18 +200,22 @@ export default function Player({ embedded = false }) {
     }
   }
 
+  const pad = (n) => String(n).padStart(2, '0');
+
   const header = (
     <div className="player-top">
-      {!embedded && (
+      {embedded ? (
+        <p className="embed-title">{guide.title}</p>
+      ) : (
         <Link to={`/g/${id}`} className="back-link">
           ← {guide.title}
         </Link>
       )}
-      {embedded && <b className="embed-title">{guide.cover} {guide.title}</b>}
       <ProgressBar value={progress} />
-      <div className="player-progress-text muted">
-        {done ? 'Пройдено полностью' : `Шаг ${index + 1} из ${steps.length} · осталось ~${formatMinutes(minutesLeft)}`}
-      </div>
+      <p className="player-progress-text">
+        {done ? 'Пройдено полностью' : `Шаг ${index + 1} из ${steps.length}`}
+        {!done && <span className="muted"> · осталось около {formatMinutes(minutesLeft)}</span>}
+      </p>
     </div>
   );
 
@@ -219,23 +223,23 @@ export default function Player({ embedded = false }) {
     return (
       <div className={`player ${embedded ? 'embedded' : ''}`}>
         {header}
-        <div className="finish card">
-          <div className="finish-emoji">🎉</div>
-          <h2>Готово!</h2>
+        <section className="finish">
+          <p className="eyebrow">Готово</p>
+          <h2>Вы прошли «{guide.title}»</h2>
           <p>
-            Вы прошли «{guide.title}». {steps.length} {plural(steps.length, ['шаг', 'шага', 'шагов'])} позади.
+            {steps.length} {plural(steps.length, ['шаг', 'шага', 'шагов'])} из {steps.length}.
           </p>
 
           {!embedded && user && user.id !== guide.author_id && (
             <div className="finish-rate">
               <p>Насколько инструкция помогла?</p>
               <StarsInput value={myRating} onChange={rate} />
-              {myRating && <p className="muted small">Спасибо! Это поднимет полезные инструкции выше.</p>}
+              {myRating && <p className="muted small">Оценка сохранена.</p>}
             </div>
           )}
           {!embedded && !user && (
             <p className="muted">
-              <Link to="/login" state={{ from: `/g/${id}` }}>Войдите</Link>, чтобы оценить инструкцию — прогресс сохранится.
+              <Link to="/login" state={{ from: `/g/${id}` }}>Войдите</Link>, чтобы поставить оценку. Прогресс не потеряется.
             </p>
           )}
 
@@ -243,18 +247,19 @@ export default function Player({ embedded = false }) {
             <button className="btn" onClick={restart}>Пройти заново</button>
             {embedded ? (
               <a className="btn btn-primary" href={appUrl(`g/${id}`)} target="_blank" rel="noreferrer">
-                Открыть на Пошагово ↗
+                Открыть инструкцию на сайте
               </a>
             ) : (
-              <Link to="/" className="btn btn-primary">В каталог</Link>
+              <Link to="/" className="btn btn-primary">К списку инструкций</Link>
             )}
           </div>
           {!embedded && (
             <p className="muted small">
-              Знаете, как сделать лучше? <Link to={`/g/${id}`}>Создайте улучшенную версию</Link> или оставьте комментарий к шагу.
+              Что-то устарело или можно объяснить проще? <Link to={`/g/${id}`}>Сделайте свою версию</Link> или
+              оставьте комментарий к шагу.
             </p>
           )}
-        </div>
+        </section>
       </div>
     );
   }
@@ -276,7 +281,7 @@ export default function Player({ embedded = false }) {
                   disabled={i > maxReached}
                   onClick={() => goTo(i)}
                 >
-                  <span className="step-map-num">{complete && i !== index ? '✓' : i + 1}</span>
+                  <span className="step-map-num">{pad(i + 1)}</span>
                   <span className="step-map-title">{s.title}</span>
                 </button>
               );
@@ -284,10 +289,10 @@ export default function Player({ embedded = false }) {
           </nav>
         )}
 
-        <section className="step card" key={step.id}>
+        <section className="step" key={step.id}>
           <div className="step-head">
-            <span className="step-num">Шаг {index + 1}</span>
-            <span className="muted">~{step.minutes} мин</span>
+            <span className="step-num">{pad(index + 1)}</span>
+            <span className="muted">около {step.minutes} мин</span>
           </div>
           <h2>{step.title}</h2>
 
@@ -296,40 +301,42 @@ export default function Player({ embedded = false }) {
           {step.checklist.length > 0 && (
             <div className="checklist">
               <div className="checklist-head">
-                Проверьте себя
-                <span className="muted">
-                  {marks.length}/{step.checklist.length}
+                <span>Проверьте себя</span>
+                <span>
+                  {marks.length} из {step.checklist.length}
                 </span>
               </div>
               {step.checklist.map((item, i) => (
                 <label key={i} className={`check ${marks.includes(i) ? 'checked' : ''}`}>
                   <input type="checkbox" checked={marks.includes(i)} onChange={() => toggle(i)} />
                   <span className="checkmark" />
-                  {item}
+                  <span>{item}</span>
                 </label>
               ))}
             </div>
           )}
 
-          {step.tip && <div className="tip">💡 {step.tip}</div>}
+          {step.tip && (
+            <p className="tip">
+              <b>Совет.</b> {step.tip}
+            </p>
+          )}
 
           {warnUnchecked && (
-            <div className="warn">
-              Отмечены не все пункты. Точно всё сделали? Нажмите ещё раз, чтобы перейти дальше.
-            </div>
+            <p className="warn">Отмечены не все пункты. Если всё сделано, нажмите ещё раз.</p>
           )}
 
           <div className="step-nav">
             <button className="btn" onClick={goBack} disabled={index === 0}>
-              ← Назад
+              Назад
             </button>
             {!embedded && (
-              <button className="btn btn-ghost stuck-btn" onClick={stuck} title="Сообщить автору, что здесь трудно">
-                😵 Застрял
+              <button className="link-btn stuck-btn" onClick={stuck} title="Автор увидит, что на этом шаге сложно">
+                Не получается
               </button>
             )}
             <button className="btn btn-primary" onClick={goNext}>
-              {warnUnchecked ? 'Всё равно дальше' : isLast ? 'Завершить ✓' : 'Дальше →'}
+              {warnUnchecked ? 'Всё равно дальше' : isLast ? 'Завершить' : 'Дальше'}
             </button>
           </div>
 
@@ -337,13 +344,13 @@ export default function Player({ embedded = false }) {
             <div className="step-feedback">
               <span className="muted">Шаг понятный?</span>
               <button className={`vote ${step.myVote === 1 ? 'active' : ''}`} onClick={() => vote(1)}>
-                👍 {step.up}
+                Да <span className="vote-count">{step.up}</span>
               </button>
-              <button className={`vote ${step.myVote === -1 ? 'active down' : ''}`} onClick={() => vote(-1)}>
-                👎 {step.down}
+              <button className={`vote ${step.myVote === -1 ? 'active' : ''}`} onClick={() => vote(-1)}>
+                Нет <span className="vote-count">{step.down}</span>
               </button>
               <button className="link-btn" onClick={() => setPanel(panel ? null : 'comment')}>
-                💬 Комментарии ({stepComments.length})
+                Комментарии ({stepComments.length})
               </button>
             </div>
           )}
@@ -351,9 +358,9 @@ export default function Player({ embedded = false }) {
           {panel && (
             <div className="step-comments">
               {panel === 'question' && (
-                <div className="notice">
-                  Автор увидит, что на этом шаге возникают сложности. Посмотрите, может, кто-то уже спрашивал, — или задайте вопрос.
-                </div>
+                <p className="notice">
+                  Отметили: автор увидит это в статистике шага. Ниже вопросы других людей, можно задать свой.
+                </p>
               )}
               <StepComments
                 step={step}
@@ -369,11 +376,11 @@ export default function Player({ embedded = false }) {
       </div>
 
       {embedded && (
-        <div className="embed-footer">
+        <p className="embed-footer">
           <a href={appUrl(`g/${id}`)} target="_blank" rel="noreferrer">
-            Сделано на Пошагово ↗
+            Открыть инструкцию полностью
           </a>
-        </div>
+        </p>
       )}
     </div>
   );

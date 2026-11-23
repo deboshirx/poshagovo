@@ -4,8 +4,8 @@
   "description": "Пошаговые инструкции с чек-листами",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f6f7fb",
-  "theme_color": "#4f46e5",
+  "background_color": "#f3efe6",
+  "theme_color": "#f3efe6",
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { RoleBadge } from './ui';
-import { appUrl } from '../utils';
 
 function useOnline() {
   const [online, setOnline] = useState(navigator.onLine);
@@ -35,51 +34,43 @@ export default function Layout() {
       <header className="header">
         <div className="container header-inner">
           <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
-            <img src={appUrl('icon.svg')} alt="" width="30" height="30" />
             Пошагово
           </Link>
 
-          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Меню">
-            ☰
+          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen}>
+            Меню
           </button>
 
           <nav className={`nav ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)}>
-            <NavLink to="/" end>Каталог</NavLink>
-            <NavLink to="/me/new">Создать</NavLink>
+            <NavLink to="/" end>Инструкции</NavLink>
+            <NavLink to="/me/new">Написать</NavLink>
             {user ? (
               <>
                 <NavLink to="/me">Кабинет</NavLink>
                 <span className="nav-user">
-                  {user.name} <RoleBadge role={user.role} />
+                  {user.name}
+                  <RoleBadge role={user.role} />
                 </span>
-                <button className="btn btn-small btn-ghost" onClick={handleLogout}>
+                <button className="link-btn nav-logout" onClick={handleLogout}>
                   Выйти
                 </button>
               </>
             ) : (
-              <NavLink to="/login" className="btn btn-small btn-primary">
-                Войти
-              </NavLink>
+              <NavLink to="/login">Войти</NavLink>
             )}
           </nav>
         </div>
       </header>
 
       {!online && (
-        <div className="offline-bar">
-          Нет интернета. Сохранённые инструкции работают, прогресс отправится позже.
-        </div>
+        <p className="offline-bar">
+          Нет интернета. Открытые раньше инструкции работают, отметки отправятся, когда сеть вернётся.
+        </p>
       )}
 
       <main className="container main">
         <Outlet />
       </main>
-
-      <footer className="footer">
-        <div className="container">
-          Пошагово — инструкции, которые можно пройти, а не просто прочитать
-        </div>
-      </footer>
     </>
   );
 }

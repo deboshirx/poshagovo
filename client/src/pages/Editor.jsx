@@ -6,8 +6,6 @@ import Markdown from '../components/Markdown';
 import { ErrorBox, Loader } from '../components/ui';
 import { CATEGORIES, formatMinutes } from '../utils';
 
-const COVERS = ['📋', '🖥️', '📄', '🐳', '🧪', '🔑', '🏠', '🎓', '🛠️', '📦', '🚗', '🍳', '💳', '📱', '🧾', '✈️'];
-
 let keyCounter = 0;
 const newKey = () => `k${++keyCounter}`;
 
@@ -188,7 +186,7 @@ export default function Editor() {
       const onlyEmpty = steps.every((s) => !s.title && !s.body && !s.checklistText);
       setSteps(onlyEmpty ? generated : [...steps, ...generated]);
       setAiInfo(
-        `Получилось шагов: ${generated.length} (${res.source === 'ai' ? 'с помощью ИИ' : 'по структуре текста'}). Проверьте и поправьте их ниже.`,
+        `Добавлено шагов: ${generated.length} (${res.source === 'ai' ? 'разбивала нейросеть' : 'по нумерации и спискам в тексте'}). Проверьте их ниже.`,
       );
       setAiText('');
     } catch (err) {
@@ -259,26 +257,11 @@ export default function Editor() {
               Теги через запятую
               <input value={form.tags} onChange={setField('tags')} placeholder="docker, linux, установка" />
             </label>
-            <div className="span-2">
-              <span className="label">Обложка</span>
-              <div className="cover-picker">
-                {COVERS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    className={form.cover === c ? 'active' : ''}
-                    onClick={() => setForm({ ...form, cover: c })}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </div>
           </section>
 
           <section className="card ai-box">
             <button className="ai-toggle" onClick={() => setAiOpen(!aiOpen)}>
-              ✨ Есть готовый текст? Разобьём его на шаги {aiOpen ? '▴' : '▾'}
+              {aiOpen ? 'Скрыть разбивку текста' : 'Вставить готовый текст и разбить на шаги'}
             </button>
             {aiOpen && (
               <>
@@ -384,7 +367,7 @@ export default function Editor() {
           <div className="card sticky lint">
             <h3>Проверка качества</h3>
             {warnings.length === 0 ? (
-              <p className="lint-ok">✓ Выглядит хорошо, можно публиковать</p>
+              <p className="lint-ok">Замечаний нет.</p>
             ) : (
               <ul>
                 {warnings.map((w, i) => <li key={i}>{w}</li>)}

@@ -59,7 +59,7 @@ export default function Stats() {
       <Link to="/me" className="back-link">← Кабинет</Link>
       <div className="cabinet-head">
         <div>
-          <h1>Аналитика</h1>
+          <h1>Статистика</h1>
           <p className="muted">
             <Link to={`/g/${guide.id}`}>{guide.title}</Link>
           </p>
@@ -89,14 +89,13 @@ export default function Stats() {
         </div>
         <div className="card kpi">
           <span>Оценка</span>
-          <b>{guide.rating ?? '—'}</b>
+          <b>{guide.rating ? String(guide.rating).replace('.', ',') : '—'}</b>
           <small>{guide.rating_count} оценок</small>
         </div>
       </div>
 
       {summary.runs === 0 ? (
         <div className="empty-state">
-          <div className="empty-emoji">📊</div>
           <h2>Пока никто не проходил</h2>
           <p className="muted">Поделитесь ссылкой — статистика появится после первых прохождений.</p>
         </div>
@@ -104,7 +103,7 @@ export default function Stats() {
         <>
           <h2>Узкие места</h2>
           {bottlenecks.length === 0 ? (
-            <p className="lint-ok card">Явных проблемных шагов нет — люди проходят ровно 👌</p>
+            <p className="muted">Ни на одном шаге не бросают и не застревают заметно чаще, чем на остальных.</p>
           ) : (
             <div className="bottlenecks">
               {bottlenecks.map((b, i) => (
@@ -116,11 +115,11 @@ export default function Stats() {
                   <ul>
                     {b.reasons.map((r) => <li key={r}>{r}</li>)}
                   </ul>
-                  <p className="muted small">
-                    Что попробовать: разбить шаг на два, добавить картинку или пункт чек-листа, ответить на вопросы в комментариях.
-                  </p>
                 </div>
               ))}
+              <p className="muted small">
+                Обычно помогает разбить такой шаг на два, добавить пункт в чек-лист или ответить на вопросы в комментариях.
+              </p>
             </div>
           )}
 
@@ -161,9 +160,9 @@ export default function Stats() {
                   <th>Дошли</th>
                   <th>Бросили</th>
                   <th>Время (план)</th>
-                  <th>«Застрял»</th>
-                  <th>👍 / 👎</th>
-                  <th>💬</th>
+                  <th>«Не получается»</th>
+                  <th>Понятно / нет</th>
+                  <th>Комм.</th>
                 </tr>
               </thead>
               <tbody>

@@ -36,13 +36,13 @@ export default function PrintPage() {
 
       <header className="print-header">
         <h1>
-          {guide.cover} {guide.title}
+          {guide.title}
         </h1>
         <p>{guide.description}</p>
         <p className="muted">
           Автор: {guide.author_name} · {guide.steps.length} шагов · ~{formatMinutes(guide.minutes)} ·{' '}
           {DIFFICULTY[guide.difficulty]}
-          {guide.verified && ` · проверено экспертом ${guide.verified_by_name}`}
+          {guide.verified && ` · проверил эксперт: ${guide.verified_by_name}`}
         </p>
       </header>
 

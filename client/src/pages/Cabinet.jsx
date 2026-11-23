@@ -63,7 +63,6 @@ export default function Cabinet() {
           {!guides && <Loader />}
           {guides?.length === 0 && (
             <div className="empty-state">
-              <div className="empty-emoji">✍️</div>
               <h2>Вы ещё ничего не написали</h2>
               <p className="muted">Знаете, как сделать что-то, на чём другие спотыкаются? Поделитесь.</p>
               <Link to="/me/new" className="btn btn-primary">Написать первую инструкцию</Link>
@@ -87,7 +86,7 @@ export default function Cabinet() {
                     <tr key={g.id}>
                       <td>
                         <Link to={`/g/${g.id}`} className="table-title">
-                          {g.cover} {g.title}
+                          {g.title}
                         </Link>
                         <div className="muted small">
                           {g.steps_count} шагов · изменено {timeAgo(g.updated_at)}
@@ -96,9 +95,9 @@ export default function Cabinet() {
                       </td>
                       <td>
                         {g.status === 'published' ? (
-                          <span className="badge badge-verified">опубликована</span>
+                          <span>опубликована</span>
                         ) : (
-                          <span className="badge badge-draft">черновик</span>
+                          <span className="accent">черновик</span>
                         )}
                       </td>
                       <td>{g.runs_count}</td>
@@ -107,9 +106,9 @@ export default function Cabinet() {
                         <StarsView value={g.rating} count={g.rating_count} />
                       </td>
                       <td className="table-actions">
-                        <Link to={`/me/guides/${g.id}/stats`} className="btn btn-small">Аналитика</Link>
+                        <Link to={`/me/guides/${g.id}/stats`} className="btn btn-small">Статистика</Link>
                         <Link to={`/me/guides/${g.id}/edit`} className="btn btn-small">Изменить</Link>
-                        <button className="btn btn-small btn-danger" onClick={() => remove(g)}>✕</button>
+                        <button className="btn btn-small btn-danger" onClick={() => remove(g)}>Удалить</button>
                       </td>
                     </tr>
                   ))}
@@ -127,7 +126,6 @@ export default function Cabinet() {
           <div className="runs-list">
             {runs?.map((r) => (
               <Link key={r.id} to={r.finished_at ? `/g/${r.guide_id}` : `/g/${r.guide_id}/run`} className="card run-item">
-                <span className="cover small">{r.cover}</span>
                 <div className="run-item-body">
                   <b>{r.title}</b>
                   <ProgressBar value={r.finished_at ? 1 : r.current_step / Math.max(1, r.steps_count)} />

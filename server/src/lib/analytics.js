@@ -144,7 +144,7 @@ export function guideAnalytics(guideId) {
 function explain(s) {
   const reasons = [];
   if (s.leftHere) reasons.push(`здесь бросили ${s.leftHere} из ${s.reached} (${Math.round(s.dropRate * 100)}%)`);
-  if (s.stuck) reasons.push(`«Застрял» нажимали ${s.stuck} раз`);
+  if (s.stuck) reasons.push(`«Не получается» нажимали ${s.stuck} раз`);
   if (s.medianMs && s.medianMs > s.plannedMinutes * 60000 * 1.3) {
     reasons.push(`в среднем ${Math.round(s.medianMs / 60000)} мин вместо ${s.plannedMinutes}`);
   }

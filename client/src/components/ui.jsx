@@ -3,7 +3,6 @@ import { useState } from 'react';
 export function Loader({ text = 'Загружаем…' }) {
   return (
     <div className="loader">
-      <span className="spinner" />
       {text}
     </div>
   );
@@ -49,12 +48,12 @@ export function CopyButton({ text, label = 'Копировать' }) {
 
   return (
     <button type="button" className="btn btn-small btn-ghost" onClick={copy}>
-      {copied ? 'Скопировано ✓' : label}
+      {copied ? 'Скопировано' : label}
     </button>
   );
 }
 
 export function RoleBadge({ role }) {
   if (role !== 'expert') return null;
-  return <span className="badge badge-expert" title="Эксперт платформы">эксперт</span>;
+  return <span className="role-tag" title="Эксперт: может подтверждать инструкции">эксперт</span>;
 }

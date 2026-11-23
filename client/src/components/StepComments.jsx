@@ -63,9 +63,9 @@ export default function StepComments({ step, comments, guideAuthorId, initialKin
           <div className="comment-head">
             <b>{c.author_name}</b>
             <RoleBadge role={c.author_role} />
-            {c.user_id === guideAuthorId && <span className="badge">автор</span>}
+            {c.user_id === guideAuthorId && <span className="role-tag">автор инструкции</span>}
             {c.kind !== 'comment' && <span className={`kind kind-${c.kind}`}>{KIND_LABELS[c.kind]}</span>}
-            {c.resolved ? <span className="badge badge-verified">учтено</span> : null}
+            {c.resolved ? <span className="role-tag">учтено</span> : null}
             <span className="muted">{timeAgo(c.created_at)}</span>
             {user && (user.id === c.user_id || user.id === guideAuthorId) && (
               <button className="link-btn" onClick={() => remove(c.id)}>

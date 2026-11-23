@@ -4,13 +4,14 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import GuideCard from '../components/GuideCard';
 import { ErrorBox, Loader, ProgressBar } from '../components/ui';
+import { pluralN } from '../utils';
 
 const SORTS = [
-  { id: 'useful', name: 'Полезные' },
-  { id: 'popular', name: 'Популярные' },
-  { id: 'rating', name: 'По оценке' },
-  { id: 'new', name: 'Новые' },
-  { id: 'short', name: 'Быстрые' },
+  { id: 'useful', name: 'сначала полезные' },
+  { id: 'popular', name: 'сначала популярные' },
+  { id: 'rating', name: 'по оценке' },
+  { id: 'new', name: 'сначала новые' },
+  { id: 'short', name: 'сначала короткие' },
 ];
 
 const EXAMPLES = ['докер', 'справка в военкомат', 'собрать комп', 'оформить лабу', 'общага'];
@@ -75,54 +76,52 @@ export default function Catalog() {
 
   return (
     <>
-      <section className="hero">
-        <h1>Делаете впервые? Пройдите по шагам.</h1>
-        <p>
-          Инструкции с чек-листами от тех, кто уже это делал: от сборки ПК до справки в деканате.
-          Отмечайте шаги, задавайте вопросы прямо там, где застряли.
-        </p>
+      <section className="catalog-head">
+        <h1>Инструкции</h1>
         <div className="search">
-          <span className="search-icon">⌕</span>
+          <label htmlFor="search" className="visually-hidden">
+            Поиск инструкций
+          </label>
           <input
+            id="search"
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Что нужно сделать? Например: поставить докер"
-            aria-label="Поиск инструкций"
+            placeholder="Что нужно сделать"
+            autoComplete="off"
           />
         </div>
-        <div className="examples">
-          {EXAMPLES.map((ex) => (
-            <button key={ex} className="chip chip-light" onClick={() => setQuery(ex)}>
-              {ex}
-            </button>
+        <p className="examples">
+          Например:{' '}
+          {EXAMPLES.map((ex, i) => (
+            <span key={ex}>
+              <button className="link-btn" onClick={() => setQuery(ex)}>
+                {ex}
+              </button>
+              {i < EXAMPLES.length - 1 && ', '}
+            </span>
           ))}
-        </div>
+        </p>
       </section>
 
       {activeRuns.length > 0 && !q && (
         <section className="continue">
-          <h2>Продолжить</h2>
-          <div className="continue-list">
-            {activeRuns.map((r) => (
-              <Link key={r.id} to={`/g/${r.guide_id}/run`} className="continue-item">
-                <span className="cover small">{r.cover}</span>
-                <div>
-                  <b>{r.title}</b>
-                  <ProgressBar value={r.current_step / Math.max(1, r.steps_count)} />
-                  <span className="muted">
-                    шаг {r.current_step + 1} из {r.steps_count}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <h2>Вы остановились</h2>
+          {activeRuns.map((r) => (
+            <Link key={r.id} to={`/g/${r.guide_id}/run`} className="continue-item">
+              <span className="continue-title">{r.title}</span>
+              <span className="continue-step">
+                шаг {r.current_step + 1} из {r.steps_count}
+              </span>
+              <ProgressBar value={r.current_step / Math.max(1, r.steps_count)} />
+            </Link>
+          ))}
         </section>
       )}
 
       <div className="filters">
-        <div className="chips">
-          <button className={`chip ${category === 'all' ? 'active' : ''}`} onClick={() => setParam('category', '')}>
+        <nav className="tabs-inline" aria-label="Категории">
+          <button className={category === 'all' ? 'active' : ''} onClick={() => setParam('category', '')}>
             Все
           </button>
           {categories
@@ -130,13 +129,13 @@ export default function Catalog() {
             .map((c) => (
               <button
                 key={c.id}
-                className={`chip ${category === c.id ? 'active' : ''}`}
+                className={category === c.id ? 'active' : ''}
                 onClick={() => setParam('category', c.id)}
               >
-                {c.name} <span className="chip-count">{c.count}</span>
+                {c.name} <span className="count">{c.count}</span>
               </button>
             ))}
-        </div>
+        </nav>
         {!q && (
           <select value={sort} onChange={(e) => setParam('sort', e.target.value, 'useful')} aria-label="Сортировка">
             {SORTS.map((s) => (
@@ -151,21 +150,25 @@ export default function Catalog() {
       <ErrorBox error={error} />
       {loading && !guides && <Loader />}
 
+      {guides && q && (
+        <p className="result-count muted">
+          {guides.length ? `Нашлось: ${pluralN(guides.length, ['инструкция', 'инструкции', 'инструкций'])}` : ''}
+        </p>
+      )}
+
       {guides && guides.length === 0 && (
         <div className="empty-state">
-          <div className="empty-emoji">🔍</div>
-          <h2>Ничего не нашлось</h2>
-          <p className="muted">Может, именно вы напишете эту инструкцию?</p>
-          <Link to="/me/new" className="btn btn-primary">
-            Создать инструкцию
-          </Link>
+          <h2>По запросу «{q}» ничего нет</h2>
+          <p>
+            Попробуйте другие слова или <Link to="/me/new">напишите эту инструкцию сами</Link>.
+          </p>
         </div>
       )}
 
       {guides && guides.length > 0 && (
-        <div className={`grid ${loading ? 'is-loading' : ''}`}>
-          {guides.map((g) => (
-            <GuideCard key={g.id} guide={g} />
+        <div className={`guide-list ${loading ? 'is-loading' : ''}`}>
+          {guides.map((g, i) => (
+            <GuideCard key={g.id} guide={g} index={i} />
           ))}
         </div>
       )}

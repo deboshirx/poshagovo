@@ -296,7 +296,7 @@ function route_guide_rate($id)
     $guide = find_guide($id);
     $stars = to_int(input('stars'));
     if ($stars < 1 || $stars > 5) throw new HttpError(400, 'Оценка от 1 до 5');
-    if ($guide['author_id'] === $user['id']) throw new HttpError(400, 'Свою инструкцию оценивать нельзя 🙂');
+    if ($guide['author_id'] === $user['id']) throw new HttpError(400, 'Свою инструкцию оценивать нельзя');
 
     q("INSERT INTO ratings (guide_id, user_id, stars) VALUES (?, ?, ?)
        ON CONFLICT (guide_id, user_id) DO UPDATE SET stars = excluded.stars, created_at = datetime('now')",
