@@ -4,7 +4,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import GuideCard from '../components/GuideCard';
 import { ErrorBox, Loader, ProgressBar } from '../components/ui';
-import { pluralN } from '../utils';
+import { plural, pluralN } from '../utils';
 
 const SORTS = [
   { id: 'useful', name: 'сначала полезные' },
@@ -29,6 +29,7 @@ export default function Catalog() {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [activeRuns, setActiveRuns] = useState([]);
+  const [totals, setTotals] = useState(null);
 
   function setParam(key, value, defaultValue = '') {
     setParams(
@@ -66,7 +67,18 @@ export default function Catalog() {
     setError(null);
     const search = new URLSearchParams({ q, category, sort });
     api(`/guides?${search}`)
-      .then((data) => !cancelled && setGuides(data))
+      .then((data) => {
+        if (cancelled) return;
+        setGuides(data);
+        // общие цифры для шапки считаем по полному списку
+        if (!q && category === 'all') {
+          setTotals({
+            guides: data.length,
+            steps: data.reduce((sum, g) => sum + g.steps_count, 0),
+            runs: data.reduce((sum, g) => sum + g.runs_count, 0),
+          });
+        }
+      })
       .catch((err) => !cancelled && setError(err))
       .finally(() => !cancelled && setLoading(false));
     return () => {
@@ -76,37 +88,60 @@ export default function Catalog() {
 
   return (
     <>
-      <section className="catalog-head">
-        <h1>Инструкции</h1>
-        <div className="search">
-          <label htmlFor="search" className="visually-hidden">
-            Поиск инструкций
-          </label>
-          <input
-            id="search"
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Что нужно сделать"
-            autoComplete="off"
-          />
-        </div>
-        <p className="examples">
-          Например:{' '}
-          {EXAMPLES.map((ex, i) => (
-            <span key={ex}>
-              <button className="link-btn" onClick={() => setQuery(ex)}>
+      <section className="hero">
+        <div className="hero-text">
+          <h1>Пошаговые инструкции с чек-листами</h1>
+          <div className="search">
+            <label htmlFor="search" className="visually-hidden">
+              Поиск инструкций
+            </label>
+            <input
+              id="search"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Что нужно сделать?"
+              autoComplete="off"
+            />
+          </div>
+          <div className="examples">
+            {EXAMPLES.map((ex) => (
+              <button key={ex} className="chip" onClick={() => setQuery(ex)}>
                 {ex}
               </button>
-              {i < EXAMPLES.length - 1 && ', '}
-            </span>
-          ))}
-        </p>
+            ))}
+          </div>
+        </div>
+
+        <div className="hero-art" aria-hidden="true">
+          <div className="orb" />
+          <div className="strips">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <span className="hero-word">ПОШАГОВО</span>
+          {totals && (
+            <>
+              <span className="hero-fact f1">
+                {totals.guides} {plural(totals.guides, ['инструкция', 'инструкции', 'инструкций'])}
+              </span>
+              <span className="hero-fact f2">
+                {totals.steps} {plural(totals.steps, ['шаг', 'шага', 'шагов'])}
+              </span>
+              <span className="hero-fact f3">
+                {totals.runs} {plural(totals.runs, ['прохождение', 'прохождения', 'прохождений'])}
+              </span>
+            </>
+          )}
+        </div>
       </section>
 
       {activeRuns.length > 0 && !q && (
         <section className="continue">
           <h2>Вы остановились</h2>
+          <div className="continue-list">
           {activeRuns.map((r) => (
             <Link key={r.id} to={`/g/${r.guide_id}/run`} className="continue-item">
               <span className="continue-title">{r.title}</span>
@@ -116,6 +151,7 @@ export default function Catalog() {
               <ProgressBar value={r.current_step / Math.max(1, r.steps_count)} />
             </Link>
           ))}
+          </div>
         </section>
       )}
 
@@ -166,7 +202,7 @@ export default function Catalog() {
       )}
 
       {guides && guides.length > 0 && (
-        <div className={`guide-list ${loading ? 'is-loading' : ''}`}>
+        <div className={`guide-grid ${loading ? 'is-loading' : ''}`}>
           {guides.map((g, i) => (
             <GuideCard key={g.id} guide={g} index={i} />
           ))}

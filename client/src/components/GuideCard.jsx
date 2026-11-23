@@ -1,38 +1,35 @@
 import { Link } from 'react-router-dom';
+import CategoryIcon from './CategoryIcon';
 import { DIFFICULTY, categoryName, formatMinutes, pluralN } from '../utils';
 
-// Строка каталога. Каталог сделан как оглавление справочника, а не сетка карточек:
-// так быстрее пробежать глазами и сравнить время, оценку и сложность.
 export default function GuideCard({ guide, index }) {
   const completion = guide.runs_count ? Math.round((guide.finished_count / guide.runs_count) * 100) : null;
 
   return (
-    <article className="guide-row">
-      <span className="guide-row-num">{String(index + 1).padStart(2, '0')}</span>
-
-      <div className="guide-row-main">
-        <h3>
-          <Link to={`/g/${guide.id}`}>{guide.title}</Link>
-        </h3>
-        {guide.match?.step && <p className="search-hit">Совпадение в шаге «{guide.match.step}»</p>}
-        <p className="guide-row-desc">{guide.description}</p>
-        <p className="guide-row-meta">
-          {categoryName(guide.category)} · {pluralN(guide.steps_count, ['шаг', 'шага', 'шагов'])} · около{' '}
-          {formatMinutes(guide.minutes)} · {DIFFICULTY[guide.difficulty].toLowerCase()}
-          {guide.verified && <> · <span className="verified">проверено экспертом</span></>}
-        </p>
+    <Link to={`/g/${guide.id}`} className="guide-card">
+      <div className="guide-card-top">
+        <span className="guide-card-num">{String(index + 1).padStart(2, '0')}</span>
+        <CategoryIcon category={guide.category} size={64} />
       </div>
 
-      <dl className="guide-row-stats">
-        <div>
-          <dt>оценка</dt>
-          <dd>{guide.rating ? guide.rating.toFixed(1).replace('.', ',') : '—'}</dd>
-        </div>
-        <div>
-          <dt>до конца</dt>
-          <dd>{completion != null ? `${completion}%` : '—'}</dd>
-        </div>
-      </dl>
-    </article>
+      <h3>{guide.title}</h3>
+      {guide.match?.step && <p className="search-hit">Совпадение в шаге «{guide.match.step}»</p>}
+      <p className="guide-card-meta">
+        {categoryName(guide.category)} · {pluralN(guide.steps_count, ['шаг', 'шага', 'шагов'])} · около{' '}
+        {formatMinutes(guide.minutes)}
+      </p>
+
+      <div className="guide-card-bottom">
+        <span className="arrow-btn" aria-hidden="true">
+          →
+        </span>
+        <span className="guide-card-stats">
+          {guide.rating && <span>{guide.rating.toFixed(1).replace('.', ',')} из 5</span>}
+          {completion != null && <span>{completion}% до конца</span>}
+          <span>{DIFFICULTY[guide.difficulty].toLowerCase()}</span>
+        </span>
+      </div>
+      {guide.verified && <span className="guide-card-verified">проверил эксперт</span>}
+    </Link>
   );
 }

@@ -4,6 +4,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import { loadLocalProgress } from '../offline';
 import { StarsInput, StarsView } from '../components/Stars';
+import CategoryIcon from '../components/CategoryIcon';
 import { CopyButton, ErrorBox, Loader, ProgressBar, RoleBadge } from '../components/ui';
 import { DIFFICULTY, absoluteUrl, categoryName, formatMinutes, pluralN, timeAgo } from '../utils';
 
@@ -75,6 +76,7 @@ export default function GuidePage() {
       </Link>
 
       <header className="guide-header">
+        <div className="guide-header-text">
         <p className="eyebrow">
           {categoryName(guide.category)} · {DIFFICULTY[guide.difficulty].toLowerCase()}
           {guide.status === 'draft' && <> · <span className="accent">черновик</span></>}
@@ -92,6 +94,8 @@ export default function GuidePage() {
             </>
           )}
         </p>
+        </div>
+        <CategoryIcon category={guide.category} size={132} className="guide-header-icon" />
       </header>
 
       <div className="guide-layout">
