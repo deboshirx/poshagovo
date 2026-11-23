@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: poshagovo
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/guides/categories
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: EXPERT_CODE
+        generateValue: true
